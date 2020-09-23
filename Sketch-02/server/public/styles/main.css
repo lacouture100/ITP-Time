@@ -1,0 +1,153 @@
+*{
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+@font-face {
+    font-family: OpenSans-Regular;
+    src: url(../assets/fonts/OpenSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: OpenSans-Light;
+    src: url(../assets/fonts/OpenSans-Light.ttf);
+}
+
+@font-face {
+    font-family: OpenSans-SemiBold;
+    src: url(../assets/fonts/OpenSans-SemiBold.ttf);
+}
+
+h1{
+    color: whitesmoke;
+    margin-left: 3rem;
+    font-size: 30px;
+}
+
+p {
+    font-size: 16px;
+    font-family: ;
+    color: greenyellow;
+}
+
+body {
+    background-color: #000000;
+    min-width: 1000px;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    display: flex;
+    margin-top: 2.5rem;
+    margin: 3rem;
+    flex-direction: column;
+    background-color: #242525;
+}
+.submit{
+    background-color: rgba(224, 255, 255, 0.021);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.submit__form{
+    background-color: rgba(224, 255, 255, 0.021);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.submit__label{
+    background-color: rgba(224, 255, 255, 0.021);
+    color: blanchedalmond;
+    font-size: 20px;
+    text-align: center;
+    margin-left: 4rem;
+    margin-right: 4rem;
+
+}
+
+.submit__input{
+    background-color: white;
+    color: #232323;
+}
+
+.submit__button{
+    background-color: rgba(224, 255, 255, 0.021);
+    color: blanchedalmond;
+    width: 20%;
+}
+ 
+.catalogue {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+    border: 1px solid #626cff;
+
+    margin: 0;
+    padding: 1%;
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    border: 1px solid #da0505;
+    height: 300px;
+    width: 22%;
+    margin: 1%;
+}
+
+.category__label {
+    display: flex;
+    flex-direction: row;
+    font-family: OpenSans-Regular;
+    color: red;
+    text-align: center;
+    border:red;
+}
+
+.category__content{
+    display: flex;
+    flex-direction: column;
+    font-family: OpenSans-Regular;
+    text-align: left;
+}
+
+.category__button{
+    background-color: rgba(224, 255, 255, 0.021);
+    color: blanchedalmond;
+    text-align: center;
+
+}
+
+.idea {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #232323;
+    width: 100%;
+    margin: 1%;
+}
+
+.idea__label {
+    display: flex;
+    font-family: OpenSans-Regular;
+    color: red;
+    text-align: left;
+}
+
+.idea__text {
+    display: flex;
+    font-family: OpenSans-Regular;
+    color: greenyellow;
+    text-align: left;
+}
+
+@media screen and (max-width:2400px) {}
+
+@media screen and (max-width:1400px) {}
+
+@media screen and (max-width:400px) {}
+
+@media screen and (max-height:820px) {}
