@@ -1,0 +1,111 @@
+* {
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+@font-face {
+    font-family: OpenSans-Regular;
+    src: url(assets/OpenSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: OpenSans-Light;
+    src: url(assets/OpenSans-Light.ttf);
+}
+
+@font-face {
+    font-family: OpenSans-SemiBold;
+    src: url(assets/OpenSans-SemiBold.ttf);
+}
+
+
+h1{
+    font-size: 32px;
+    color: whitesmoke;
+    font-family: OpenSans-SemiBold;
+    margin-left: 0%;
+    
+}
+
+h2{
+    color: whitesmoke;
+    font-family: OpenSans-Light;
+    margin: auto;
+}
+label{
+    color: black;
+    font-family: OpenSans-Light;
+}
+
+body {
+    background-color: rgb(58, 58, 58);
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    font-family: OpenSans-Regular;
+
+}
+
+.submit__form{
+    background-color: rgba(224, 255, 255, 0.021);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 40%;
+    height: 5vh;
+    margin: auto;
+    margin-top: 2rem;
+    margin-left: 1rem;
+}
+.submit__label{
+    background-color: rgba(224, 255, 255, 0.021);
+    color: blanchedalmond;
+    width: 30%;
+    font-size: 20px;
+    text-align: center;
+    margin: auto;
+
+
+}
+.submit__input{
+    background-color: white;
+    color: black;
+    width: 50%;
+    height: 100%;
+}
+.submit__button{
+    background-color: rgba(224, 255, 255, 0.021);
+    color: blanchedalmond;
+    width: 20%;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    width: 40vw;
+    margin: auto;
+    margin-top: 2rem;
+    margin-left: 0rem;
+}
+
+.topping{
+    display: flex;
+    flex-direction: row;
+    justify-items: center;
+}
+
+.topping__name {
+    color: antiquewhite;
+    font-size:16px;
+    border: none;
+    width: 50%;
+    text-align: center;
+}
+
+.topping__button {
+    display: block;
+    font-size:16px;
+    width: 80%;
+}
