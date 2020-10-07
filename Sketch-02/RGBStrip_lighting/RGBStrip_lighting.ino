@@ -9,21 +9,33 @@
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, PIXELTYPE);
 
+#include <Ramp.h>
+int lastValue;                                // global variable
+rampInt myRamp;
+rampInt myRamp2;
+
 void setup() {
 
   pixels.begin();
   pixels.setBrightness(40);
   pixels.show(); // Initialize all pixels to 'off'
+
+
+    myRamp.go(255);           
+    myRamp2.go(0);           
+  myRamp.go(0, 200, LINEAR, LOOPFORWARD);  
+  myRamp2.go(255, 200, LINEAR, LOOPFORWARD);
 }
 
 void loop() {
-
-  //colorWipe(pixels.Color(255, 0, 0),20);
+   int rampVal = myRamp.update();
+   int rampVal2 = myRamp2.update();
+  colorWipe(pixels.Color(rampVal, rampVal2, rampVal2),20);
   //colorPulsingTrail(255, 0, 0,30,20);
-//  colorGradient(255, 255, 0,30,20);
+ 
 //  rainbowExp(72,2000);
  // colorHour(pixels.Color(255, 0, 0),2,200);
-  rainbowCycle(20);
+ // rainbowCycle(20);
  // CylonBounce(255, 0, 0, 3, 5, 5, 30, 500);
 }
 

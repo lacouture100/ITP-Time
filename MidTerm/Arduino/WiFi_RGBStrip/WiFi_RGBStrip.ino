@@ -13,11 +13,11 @@
   modified 09 June 2016
   by Petar Georgiev
 */
-//////////////////////////////////////////////// DEBUG //////////////////////////////////////////////////////// 
+//////////////////////////////////////////////// DEBUG ////////////////////////////////////////////////////////
 
 char separator[] = "------------------------------------------------------------";
 
-//////////////////////////////////////////////// WIFI //////////////////////////////////////////////////////// 
+//////////////////////////////////////////////// WIFI ////////////////////////////////////////////////////////
 
 #include <SPI.h>
 #include <WiFiNINA.h>
@@ -45,7 +45,7 @@ const unsigned long postingInterval = 10L * 1000L;
 bool repeatRequest = false;
 
 
-//////////////////////////////////////////////// NEOPIXEL //////////////////////////////////////////////////////// 
+//////////////////////////////////////////////// NEOPIXEL ////////////////////////////////////////////////////////
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -64,21 +64,21 @@ int minuteDelay = 60000;
 int hourDelay = 3600000;
 int count = 0;
 
-//////////////////////////////////////////////// ArduinoJSON //////////////////////////////////////////////////////// 
+//////////////////////////////////////////////// ArduinoJSON ////////////////////////////////////////////////////////
 
 #include <ArduinoJson.h>
 
 StaticJsonDocument<200> doc;
 //char json[] = "";
 
-//////////////////////////////////////////////// RTC //////////////////////////////////////////////////////// 
+//////////////////////////////////////////////// RTC ////////////////////////////////////////////////////////
 
 #include <RTCZero.h>
 RTCZero rtc;
 const int GMT = -4; //change this to adapt it to your time zone
 
 
-//////////////////////////////////////////////// SDCard //////////////////////////////////////////////////////// 
+//////////////////////////////////////////////// SDCard ////////////////////////////////////////////////////////
 
 
 
@@ -88,7 +88,10 @@ int ind2;
 
 char charArray[700];
 String dataString;
+const byte numChars = 32;
+char receivedChars[numChars];   // an array to store the received data
 
+boolean newData = false;
 void setup() {
 
   // Initialize serial port:
@@ -107,8 +110,8 @@ void setup() {
 
   // you're connected now, so print out the data:
   Serial.println("You're connected to the network");
-  printWiFiData();
-  
+  //printWiFiData();
+
   rtc.begin();
 
   unsigned long epoch;
@@ -124,12 +127,12 @@ void setup() {
   while ((epoch == 0) && (numberOfTries < maxTries));
 
   if (numberOfTries == maxTries) {
-      //Cannot reach server
+    //Cannot reach server
     Serial.print("NTP unreachable!!");
 
     while (1);
   }
-    // Time received
+  // Time received
   else {
 
     Serial.print("Epoch received: ");
@@ -159,76 +162,113 @@ void setup() {
 }
 
 void loop() {
-      
-    printDate();
 
-  printTime();
 
   //Turn on the lights to indicate a connection
   lightPulse(255, 0, 0, 20);
-  
+
   // if you get a connection, report back via serial:
   Serial.println("\nStarting connection to server...");
-  if (repeatRequest == false) {
 
-    ///Need to save the stream and then read it
-    while (client.available()) {
-      char c = client.read();
-      Serial.print(c);
-      /*append(charArray, c);*/
-      
-      //See the JSON stream
-      /*ReadLoggingStream loggingStream(client, Serial);
-      deserializeJson(doc, client);
-      DeserializationError error = deserializeJson(doc, c);
-      if (error) {
-        Serial.print(F("deserializeJson() failed: "));
-        Serial.println(error.c_str());
-        return;
+  recvWithStartEndMarkers(client);
+  showNewData();
+  char c = client.read();
+  Serial.print(c);
+  /*append(charArray, c);*/
+
+  //See the JSON stream
+  /*ReadLoggingStream loggingStream(client, Serial);
+    deserializeJson(doc, client);
+    DeserializationError error = deserializeJson(doc, c);
+    if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.c_str());
+    return;
+    }
+    const char* sunset = doc["sunset"][0];*/
+  /*
+    //Zoomcat https://forum.arduino.cc/index.php?topic=387175.0
+    Serial.print(c);
+    ind1 = readString.indexOf('time:"');
+    ind2 = readString.indexOf('', ind1+1);
+    sunset = readString.substring(ind1+1, ind2+1);
+  */
+}
+/*charToString(charArray,dataString);
+  Serial.print("Character Array : " + dataString);
+  Serial.println();
+  Serial.print(separator);*/
+while (true);
+} else {
+  while (client.available()) {
+
+    char c = client.read();
+    //Serial.write(c);
+
+
+  }
+  Serial.println(" ");
+
+  // if ten seconds have passed since your last connection,
+  // then connect again and send data:
+  if (millis() - lastConnectionTime > postingInterval) {
+    httpRequest();
+  }
+}
+}
+
+void recvWithStartEndMarkers(WiFiClient client) {
+  static boolean recvInProgress = false;
+  static byte ndx = 0;
+  char startMarker = '{';
+  char endMarker = '}';
+  char rc;
+
+  while (client.available() > 0 && newData == false) {
+    rc = client.read();
+
+    if (recvInProgress == true) {
+      if (rc != endMarker) {
+        receivedChars[ndx] = rc;
+        ndx++;
+        if (ndx >= numChars) {
+          ndx = numChars - 1;
+        }
       }
-      const char* sunset = doc["sunset"][0];*/
-      /*
-      //Zoomcat https://forum.arduino.cc/index.php?topic=387175.0
-      Serial.print(c);
-      ind1 = readString.indexOf('time:"');
-      ind2 = readString.indexOf('', ind1+1);
-      sunset = readString.substring(ind1+1, ind2+1);
-      */
+      else {
+        receivedChars[ndx] = '\0'; // terminate the string
+        recvInProgress = false;
+        ndx = 0;
+        newData = true;
+      }
     }
-    /*charToString(charArray,dataString);
-    Serial.print("Character Array : " + dataString);
-    Serial.println();
-    Serial.print(separator);*/
-    while (true);
-  } else {
-    while (client.available()) {
-      char c = client.read();
-      Serial.write(c);
 
-
-    }
-    Serial.println(" ");
-
-    // if ten seconds have passed since your last connection,
-    // then connect again and send data:
-    if (millis() - lastConnectionTime > postingInterval) {
-      httpRequest();
+    else if (rc == startMarker) {
+      recvInProgress = true;
     }
   }
 }
 
+void showNewData() {
+  if (newData == true) {
+    Serial.print("This just in ... ");
+    Serial.println(receivedChars);
+    newData = false;
+  }
+}
+
 void append(char* s, char c) {
-        int len = strlen(s);
-        s[len] = c;
-        s[len+1] = '\0';
+  int len = strlen(s);
+  s[len] = c;
+  s[len + 1] = '\0';
 }
 // https://forum.arduino.cc/index.php?topic=553372.0
 void charToString(char S[], String &D)
 {
- 
- String rc(S);
- D = rc;
- 
+
+  String rc(S);
+  D = rc;
+
 }
 
 // this method makes a HTTP connection to the server:
@@ -280,8 +320,8 @@ void lightPulse(int r, int g, int b,  uint8_t wait) {
 }
 
 
-void configureHorizon(char startSunrise, char startNightTime, char currentTime){
-   /* int current = convertToMinutes(currentTime);
+void configureHorizon(char startSunrise, char startNightTime, char currentTime) {
+  /* int current = convertToMinutes(currentTime);
     int start = convertToMinutes(startSunrise);
     int end = convertToMinutes(startNightTime);
 
@@ -299,8 +339,8 @@ void print2digits(int number) {
 }
 
 // receives time in a "HH:MM"" format
-void convertToMinutes(char time[]){
-  
+void convertToMinutes(char time[]) {
+
 }
 
 void printTime()
@@ -309,13 +349,13 @@ void printTime()
   Serial.println("GMT:" + GMT);
 
   Serial.println();
-  
+
   print2digits(rtc.getHours());
   Serial.print(":");
   print2digits(rtc.getMinutes());
   Serial.print(":");
   print2digits(rtc.getSeconds());
-  
+
   Serial.println(" ");
 
 }
@@ -324,7 +364,7 @@ void printDate()
 {
   Serial.println("DATE:");
   Serial.println();
-  
+
   Serial.print(rtc.getDay());
   Serial.print("/");
   Serial.print(rtc.getMonth());
