@@ -3,11 +3,15 @@
 #include <avr/power.h>
 #endif
 
-#define PIN 4
-#define NUMPIXELS 144
+#define PIN1 4
+#define PIN2 3
+#define NUMPIXELS1 144
+#define NUMPIXELS2 144
+
 #define PIXELTYPE NEO_GRB + NEO_KHZ800
 
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, PIXELTYPE);
+Adafruit_NeoPixel pixels1 = Adafruit_NeoPixel(NUMPIXELS1, PIN1, PIXELTYPE);
+Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS2, PIN2, PIXELTYPE);
 
 #include <Ramp.h>
 int lastValue;                                // global variable
@@ -16,10 +20,13 @@ rampInt myRamp2;
 
 void setup() {
 
-  pixels.begin();
-  pixels.setBrightness(40);
-  pixels.show(); // Initialize all pixels to 'off'
-
+  pixels1.begin();
+  pixels2.begin();
+  pixels1.setBrightness(40);
+  pixels2.setBrightness(40);
+  
+  pixels1.show(); // Initialize all pixels to 'off'
+  pixels2.show();
 
     myRamp.go(255);           
     myRamp2.go(0);           
@@ -30,7 +37,9 @@ void setup() {
 void loop() {
    int rampVal = myRamp.update();
    int rampVal2 = myRamp2.update();
-  colorWipe(pixels.Color(rampVal, rampVal2, rampVal2),20);
+  colorWipe(pixels1.Color(0,0,255),20, pixels1);
+  colorWipe(pixels2.Color(0,255,0),20, pixels2);
+
   //colorPulsingTrail(255, 0, 0,30,20);
  
 //  rainbowExp(72,2000);
@@ -63,7 +72,7 @@ void loop() {
   }
 
 */
-void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int endTrail, int SpeedDelay, int ReturnDelay) {
+void CylonBounce(Adafruit_NeoPixel pixels,int red, int green, int blue, int EyeSize, int leadTrail, int endTrail, int SpeedDelay, int ReturnDelay) {
 
   for (int i = 0; i < pixels.numPixels(); i++) {
     pixels.fill(0, 0, 0);
@@ -111,7 +120,7 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
 
 
   // Fill the dots in a sequence one by one
-  void colorWipe(uint32_t c, uint8_t wait) {
+  void colorWipe(Adafruit_NeoPixel pixels, uint32_t c, uint8_t wait) {
     for (uint16_t i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, c);
       pixels.show();
@@ -120,7 +129,7 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
   }
 
   // Make a dot travel the strip
-  void colorDot(uint32_t c, int tail, int wait) {
+  void colorDot(Adafruit_NeoPixel pixels, uint32_t c, int tail, int wait ) {
     for (uint16_t i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, c);
 
@@ -132,7 +141,7 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
   }
 
   // Make a dot travel the strip
-  void colorHour(uint32_t c, int tail, int wait) {
+  void colorHour(Adafruit_NeoPixel pixels, uint32_t c, int tail, int wait ) {
     int impact = 3;
     for (uint16_t i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, c);
@@ -151,7 +160,7 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
 
 
   // Make a dot travel the strip
-  void colorDotMinuteTrail(uint32_t c, int tail, int wait) {
+  void colorDotMinuteTrail(Adafruit_NeoPixel pixels, uint32_t c, int tail, int wait ) {
     int impact = 3;
     for (uint16_t i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, c);
@@ -171,7 +180,7 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
 
 
   // Make a dot travel the strip
-  void colorPulsingTrail(int r, int g, int b, int tail, uint8_t wait) {
+  void colorPulsingTrail(Adafruit_NeoPixel pixels, int r, int g, int b, int tail, uint8_t wait ) {
     for (uint16_t i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, pixels.Color(r, g, b));
       for (int j = 0; j < i - tail; j++) {
@@ -184,23 +193,23 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
 
 
   //* makes a differnte rainbow in the middle of the strip
-  void rainbowDual(int tail, uint8_t wait) {
+  void rainbowDual(Adafruit_NeoPixel pixels, int tail, uint8_t wait ) {
     uint16_t i, j;
     for (j = 0; j < 256; j++) {
       for (i = 0; i < pixels.numPixels(); i++) {
-        pixels.setPixelColor(i, Wheel((i + j)));
-        pixels.setPixelColor((i - tail), Wheel(j));
+        pixels.setPixelColor(i, Wheel((i + j), pixels));
+        pixels.setPixelColor((i - tail), Wheel(j, pixels));
       }
       pixels.show();
       delay(wait);
     }
   }
 
-  void rainbow(uint8_t wait) {
+  void rainbow(Adafruit_NeoPixel pixels, uint8_t wait ) {
     uint16_t i, j;
     for (j = 0; j < 256; j++) {
       for (i = 0; i < pixels.numPixels(); i++) {
-        pixels.setPixelColor(i, Wheel((i + j) & 255));
+        pixels.setPixelColor(i, Wheel((i + j) & 255, pixels));
       }
       pixels.show();
       delay(wait);
@@ -209,12 +218,12 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
 
 
   // Slightly different, this makes the rainbow equally distributed throughout
-  void rainbowCycle(uint8_t wait) {
+  void rainbowCycle(Adafruit_NeoPixel pixels, uint8_t wait ) {
     uint16_t i, j;
 
     for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
       for (i = 0; i < pixels.numPixels(); i++) {
-        pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+        pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255, pixels));
       }
       pixels.show();
       delay(wait);
@@ -224,22 +233,22 @@ void CylonBounce(int red, int green, int blue, int EyeSize, int leadTrail, int e
 
   // Input a value 0 to 255 to get a color value.
   // The colours are a transition r - g - b - back to r.
-  uint32_t Wheel(byte WheelPos) {
+  uint32_t Wheel(Adafruit_NeoPixel pixels, byte WheelPos) {
     WheelPos = 255 - WheelPos;
     if (WheelPos < 85) {
       //The lower the number, the more red it is
       // When it gets higher, Blue starts going upwards and Red goes down
       // When Wheelpos is 0, (255,0,0), when it's 85, (0,0,255)
       //RED TO BLUE
-      return pixels.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+      return pixels1.Color(255 - WheelPos * 3, 0, WheelPos * 3);
     }
     if (WheelPos < 170) {
       WheelPos -= 85;
       //BLUE TO GREEN
       //0, (0,0,255) // 170, (0,255,0)
-      return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+      return pixels1.Color(0, WheelPos * 3, 255 - WheelPos * 3);
     }
     //GREEN TO RED
     WheelPos -= 170;
-    return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+    return pixels1.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
   }
