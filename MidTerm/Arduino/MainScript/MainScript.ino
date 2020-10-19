@@ -57,20 +57,97 @@ unsigned int textLineCounter = 0;
 
 
 //////////////////////////////////////////////// NEOPIXEL ////////////////////////////////////////////////////////
-#include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
-#include <avr/power.h>
-#endif
+#include <FastLED.h>
 
-#define PIN1 5
-#define PIN2 3
-#define NUMPIXELS1 144
-#define NUMPIXELS2 144
+#define LED_PIN     3
+#define LED_PIN2     5
+#define NUM_LEDS    144
+#define BRIGHTNESS  96
+#define LED_TYPE    WS2811
+#define COLOR_ORDER GRB
+CRGB leds[NUM_LEDS];
+CRGB leds2[NUM_LEDS];
 
-#define PIXELTYPE NEO_GRB + NEO_KHZ800
+#define UPDATES_PER_SECOND 100
 
-Adafruit_NeoPixel pixels1 = Adafruit_NeoPixel(NUMPIXELS1, PIN1, PIXELTYPE);
-Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS2, PIN2, PIXELTYPE);
+// This example shows how to cross-fade between different color palettes
+// using the function nblendPaletteTowardPalette.
+//
+// The basic idea is that you always have a "current palette" that you're
+// pulling colors from with ColorFromPalette, and you have a "target palette"
+// which is the 'next' palette that you want to get to.
+//
+// After that, implementation is relatively simple: just periodically call
+//   nblendPaletteTowardPalette( currentPalette, targetPalette);
+// If the current palette is not yet equal to the target palette, this
+// function will make a few small changes to the current palette to make
+// it slightly more like the target.  Over time, the current palette will
+// come to be equal to the target.
+// There's no need to test the current and target for equality; it's safe
+// to keep calling nblendPaletteTowardPalette even after current reaches target.
+// For faster blending, call nblendPaletteTowardPalette twice per loop.
+
+
+CRGBPalette16 currentPalette( CRGB::Black);
+CRGBPalette16 currentPalette2( CRGB::Black);
+CRGBPalette16 targetPalette( CRGBPalette16(
+                               CHSV(180, 255, 255),
+                               CHSV(192, 255, 255),
+                               CHSV(192, 255, 255),
+                               CHSV(0, 255, 255),
+                               /**/
+                               CHSV(0, 255, 255),
+                               CHSV(0, 255, 255),
+                               CHSV(0, 255, 255),
+                               CHSV(0, 255, 255),
+                               /**/
+                               CHSV(0, 255, 255),
+                               CHSV(0, 255, 255),
+                               CHSV(0, 180, 255),
+                               CHSV(0, 180, 255),
+                               /**/
+                               CHSV(0, 255, 255),
+                               CHSV(192, 255, 255),
+                               CHSV(192, 255, 255),
+                               CHSV(180, 255, 255)) );
+CRGBPalette16 targetPalette2(  CRGBPalette16(
+                                 CHSV(180, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 /**/
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 /**/
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 180, 255),
+                                 CHSV(0, 180, 255),
+                                 /**/
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(0, 255, 255),
+                                 CHSV(180, 255, 255)));
+
+
+int timeCounter = 0;
+
+unsigned long startMillis;
+unsigned long startLEDMillis;
+unsigned long currentMillis;
+const unsigned long period = 1000;
+
+bool paletteMsg_1 = true;
+bool paletteMsg_2 = true;
+bool paletteMsg_3 = true;
+bool paletteMsg_4 = true;
+bool paletteMsg_5 = true;
+bool paletteMsg_6 = true;
+bool paletteMsg_7 = true;
+bool paletteMsg_8 = true;
+bool paletteMsg_9 = true;
 
 
 
@@ -246,18 +323,24 @@ void loop() {
   */
 
   //Turn on the lights to indicate a connection
-  lightPulse(pixels1, 0, 0, 255, 20);
-
-  apiHttpRequest(myDataObject);
+  //lightPulse(pixels1, 0, 0, 255, 20);
+  while(!dawnMillis){
+     apiHttpRequest(myDataObject);
+  }
+ 
   Serial.println("dawnMillis :");
-Serial.println(dawnMillis);
+  Serial.println(dawnMillis);
+
+
+  runLights(currentTimeToMillis() , dawnMillis, sunriseMillis, sunriseEndMillis, goldenHourEndMillis, solarNoonMillis, goldenHourMillis, sunsetStartMillis, sunsetMillis, nightMillis);
+  
   //configureHorizon(-4);
 
   //ReadSD();
 
-  lightPulse(pixels2, sunriseR, sunriseG, sunriseB, 20);
+  //lightPulse(pixels2, sunriseR, sunriseG, sunriseB, 20);
 
-  lightPulse(pixels1, duskR, duskG, duskB, 20);
+  //lightPulse(pixels1, duskR, duskG, duskB, 20);
 
 
 }

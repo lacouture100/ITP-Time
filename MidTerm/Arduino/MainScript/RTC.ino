@@ -37,6 +37,8 @@ long unsigned currentTimeToMillis() {
   // Current hour * 1000 milliseconds per minute.
   long unsigned secondsInMillis = rtc.getSeconds() * 1000;
   long unsigned currentTimeInMillis = hoursInMillis + minutesInMillis + secondsInMillis;
+  Serial.println("Current Time in milllis");
+    Serial.println(currentTimeInMillis);
   return currentTimeInMillis;
 }
 
