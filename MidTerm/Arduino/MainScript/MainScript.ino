@@ -1,3 +1,5 @@
+
+
 /*
 
   This script controls the Horizonte Clock developed by Alvaro Lacouture.
@@ -17,6 +19,8 @@ char separator[] = "------------------------------------------------------------
 #include <SPI.h>
 #include <WiFiNINA.h>
 #include <StreamUtils.h>
+#include <ArduinoHttpClient.h>
+
 #include "arduino_secrets.h"
 
 
@@ -25,12 +29,20 @@ char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS ;    // your network password (use for WPA, or use as key for WEP)
 int status = WL_IDLE_STATUS;     // the WiFi radio's status
 
+
 // Specify IP address or hostname
 char server[] = "horizonte-api.herokuapp.com" ;//"192.168.1.152";
-int port = 3000;
+int port = 80;
 
-// Declare our WiFiNINA client
+// Declare our WiFiNINA client - GET the requests
 WiFiClient client;
+HttpClient httpclient = HttpClient(client, server, port);
+
+// Declare our server for the AP point
+WiFiServer APserver(80);
+char APssid[] = "HorizonClockAP";        // your network SSID (name)
+char APpass[] = "yeahbaby";    // your network password (use for WPA, or use as key for WEP)
+int keyIndex = 0;                // your network key Index number (needed only for WEP)
 
 // last time you connected to the server, in milliseconds
 unsigned long lastConnectionTime = 0;
@@ -39,20 +51,27 @@ const unsigned long postingInterval = 10L * 1000L;
 // Make a request every ten seconds
 bool repeatRequest = false;
 
+bool isAPActive = false;
+
+unsigned int textLineCounter = 0;
+
 
 //////////////////////////////////////////////// NEOPIXEL ////////////////////////////////////////////////////////
-
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
 #include <avr/power.h>
 #endif
 
-#define PIN 4
-#define NUMPIXELS 144
+#define PIN1 5
+#define PIN2 3
+#define NUMPIXELS1 144
+#define NUMPIXELS2 144
+
 #define PIXELTYPE NEO_GRB + NEO_KHZ800
 
-// Declare our first neopixel strip
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, PIXELTYPE);
+Adafruit_NeoPixel pixels1 = Adafruit_NeoPixel(NUMPIXELS1, PIN1, PIXELTYPE);
+Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS2, PIN2, PIXELTYPE);
+
 
 
 int minuteDelay = 60000;
@@ -75,280 +94,170 @@ const int GMT = -4; //change this to adapt it to your time zone
 
 //////////////////////////////////////////////// SDCard ////////////////////////////////////////////////////////
 
+#include <SPI.h>
+#include <SD.h>
+
+File myFile;
 
 
+////////////////////////////////////////////// ArduinoJSON ////////////////////////////////////////////////////
+#include <Arduino_JSON.h>
+
+JSONVar myDataObject;
+
+JSONVar sunrise;
+JSONVar night;
+
+//dawn, sunrise, sunriseEnd, goldenHourEnd, solarNoon, goldenHour, sunsetStart, sunset, dusk, night
+int dawnR, dawnG, dawnB;
+int sunriseR, sunriseG, sunriseB;
+int sunriseEndR, sunriseEndG, sunriseEndB;
+int goldenHourEndR, goldenHourEndG, goldenHourEndB;
+int solarNoonR, solarNoonG, solarNoonB;
+int goldenHourR, goldenHourG, goldenHourB;
+int sunsetStartR, sunsetStartG, sunsetStartB;
+int sunsetR, sunsetG, sunsetB;
+int duskR, duskG, duskB;
+int nightR, nightG, nightB;
+long dawnMillis, sunriseMillis, sunriseEndMillis, goldenHourEndMillis, solarNoonMillis, goldenHourMillis, sunsetStartMillis, sunsetMillis, duskMillis, nightMillis;
+
+
+//////////////////////////////////////////////    Math    ////////////////////////////////////////////////////
+
+#include <math.h>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int ind1; // , locations
 int ind2;
 
-char charArray[700];
-String dataString;
-const byte numChars = 32;
-char receivedChars[numChars];   // an array to store the received data
+String APdataString = "";
+String ssidString = "";
 
+String  passString = "";
+
+String  latString = "";
+String  longString = "";
+String  GMTString = "";
 boolean newData = false;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void setup() {
 
   // Initialize serial port:
   Serial.begin(9600);
 
-  // attempt to connect to WiFi network:
-  while ( status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network:
-    status = WiFi.begin(ssid, pass);
+  Serial.println("Access Point Web Server");
 
-    // wait 5 seconds for connection:
-    delay(5000);
+
+  // check for the WiFi module:
+  if (WiFi.status() == WL_NO_MODULE) {
+    Serial.println("Communication with WiFi module failed!");
+    // don't continue
+    while (true);
   }
 
+  String fv = WiFi.firmwareVersion();
+  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
+    Serial.println("Please upgrade the firmware");
+  }
+/*
+  // print the network name (SSID);
+  Serial.print("Creating access point named: ");
+  Serial.println(APssid);
+
+  // Create open network. Change this line if you want to create an WEP network:
+  status = WiFi.beginAP(APssid, APpass);
+  if (status != WL_AP_LISTENING) {
+    Serial.println("Creating access point failed");
+    // don't continue
+    while (true);
+  }
+
+  // wait 10 seconds for connection:
+  delay(1000);
+*/
+  // start the web server on port 80
+  //APserver.begin();
+
+  // you're connected now, so print out the status
+  printWiFiStatus();
+
+  
+    // attempt to connect to WiFi network:
+    while ( status != WL_CONNECTED ) {
+      Serial.print("Attempting to connect to WPA SSID: ");
+      Serial.println(ssid);
+      // Connect to WPA/WPA2 network:
+      status = WiFi.begin(ssid, pass);
+
+      // wait 5 seconds for connection:
+      delay(5000);
+    }
+ 
   // you're connected now, so print out the data:
   Serial.println("You're connected to the network");
-  //printWiFiData();
 
-  rtc.begin();
+  
+  rtcGetTime();
+  //printTime();
+  //printDate();
+  //startSDCard();
 
-  unsigned long epoch;
-  int numberOfTries = 0, maxTries = 6;
-
-  do {
-
-    epoch = WiFi.getTime();
-    numberOfTries++;
-
-  }
-
-  while ((epoch == 0) && (numberOfTries < maxTries));
-
-  if (numberOfTries == maxTries) {
-    //Cannot reach server
-    Serial.print("NTP unreachable!!");
-
-    while (1);
-  }
-  // Time received
-  else {
-
-    Serial.print("Epoch received: ");
-    Serial.println(epoch);
-    //set the epoc for the rtc
-    rtc.setEpoch(epoch);
-
-    Serial.println();
-
-  }
-
-  // If connect to server,send the GET request to our server.
-  if (client.connect(server, 80)) {
+  /*// If connect to server,send the GET request to our server.
+    if (client.connect(server, 80)) {
     Serial.println("connected to Horizonte API");
-    // Make a HTTP request:
-    //client.println adds a /r/n/ at the end.
-    client.println("GET /sun HTTP/1.1");
-    client.println("Host: horizonte-api.herokuapp.com");
-    client.println("Connection: close");
-    client.println();
-  }
-
-
-  pixels.begin();
-  pixels.setBrightness(40);
-  pixels.show(); // Initialize all pixels to 'off'
+    //
+    }
+  */
+  startPixels();
 }
 
 void loop() {
+/*
+  if (status != WiFi.status()) {
+    // it has changed update the variable
+    status = WiFi.status();
 
+    if (status == WL_AP_CONNECTED) {
+      // a device has connected to the AP
+      Serial.println("Device connected to AP");
+    } else {
+      // a device has disconnected from the AP, and we are back in listening mode
+      Serial.println("Device disconnected from AP");
+    }
+  }
+
+  WiFiClient APclient = APserver.available();   // listen for incoming clients
+
+  // if you get a client,
+  
+
+
+  if (APdataString != "") {
+    processDataRequest(APdataString);
+
+  } else {
+    LoadAPClientPage(APclient);
+  }
+
+  */
 
   //Turn on the lights to indicate a connection
-  //lightPulse(255, 0, 0, 20);
+  lightPulse(pixels1, 0, 0, 255, 20);
 
-  // if you get a connection, report back via serial:
- while (client.available()) {
-  char c = client.read();
-  Serial.print(c);
-  /*append(charArray, c);*/
- }
+  apiHttpRequest(myDataObject);
+  Serial.println("dawnMillis :");
+Serial.println(dawnMillis);
+  //configureHorizon(-4);
 
-  if (!client.connected()) {
-    Serial.println();
-    Serial.println("disconnecting from server.");
-    client.stop();
+  //ReadSD();
 
-    // do nothing forevermore:
-    while (true);
-  }
-  //See the JSON stream
-  /*ReadLoggingStream loggingStream(client, Serial);
-    deserializeJson(doc, client);
-    DeserializationError error = deserializeJson(doc, c);
-    if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.c_str());
-    return;
-    }
-    const char* sunset = doc["sunset"][0];*/
-  /*
-    //Zoomcat https://forum.arduino.cc/index.php?topic=387175.0
-    Serial.print(c);
-    ind1 = readString.indexOf('time:"');
-    ind2 = readString.indexOf('', ind1+1);
-    sunset = readString.substring(ind1+1, ind2+1);
-*/
-}
+  lightPulse(pixels2, sunriseR, sunriseG, sunriseB, 20);
 
-void recvWithStartEndMarkers(WiFiClient client) {
-  static boolean recvInProgress = false;
-  static byte ndx = 0;
-  char startMarker = '{';
-  char endMarker = '}';
-  char rc;
-
-  while (client.available() > 0 && newData == false) {
-    rc = client.read();
-
-    if (recvInProgress == true) {
-      if (rc != endMarker) {
-        receivedChars[ndx] = rc;
-        ndx++;
-        if (ndx >= numChars) {
-          ndx = numChars - 1;
-        }
-      }
-      else {
-        receivedChars[ndx] = '\0'; // terminate the string
-        recvInProgress = false;
-        ndx = 0;
-        newData = true;
-      }
-    }
-
-    else if (rc == startMarker) {
-      recvInProgress = true;
-    }
-  }
-}
-
-void showNewData() {
-  if (newData == true) {
-    Serial.print("This just in ... ");
-    Serial.println(receivedChars);
-    newData = false;
-  }
-}
-
-void append(char* s, char c) {
-  int len = strlen(s);
-  s[len] = c;
-  s[len + 1] = '\0';
-}
-// https://forum.arduino.cc/index.php?topic=553372.0
-void charToString(char S[], String &D)
-{
-
-  String rc(S);
-  D = rc;
-
-}
-
-// this method makes a HTTP connection to the server:
-void httpRequest() {
-  // close any connection before send a new request.
-  // This will free the socket on the Nina module
-  client.stop();
-
-  // if there's a successful connection:
-  if (client.connect(server, port)) {
-    Serial.println("connected to server");
-    // Make a HTTP request:
-    client.println("GET /sun HTTP/1.1");
-    client.println("Host: 192.168.1.152");
-    client.println("Connection: close");
-    client.println();
-
-    // note the time that the connection was made:
-    lastConnectionTime = millis();
-  } else {
-    // if you couldn't make a connection:
-    Serial.println("connection failed");
-  }
-}
+  lightPulse(pixels1, duskR, duskG, duskB, 20);
 
 
-void printWiFiData() {
-  // print your board's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP address : ");
-  Serial.println(ip);
-
-  Serial.print("Subnet mask: ");
-  Serial.println((IPAddress)WiFi.subnetMask());
-
-  Serial.print("Gateway IP : ");
-  Serial.println((IPAddress)WiFi.gatewayIP());
-
-}
-
-
-// Make a dot travel the strip
-void lightPulse(int r, int g, int b,  uint8_t wait) {
-  for (uint16_t i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, pixels.Color(r - (i * 10), g - (i * 10), b - (i * 10)));
-    pixels.show();
-    delay(wait);
-  }
-}
-
-
-void configureHorizon(char startSunrise, char startNightTime, char currentTime) {
-  /* int current = convertToMinutes(currentTime);
-    int start = convertToMinutes(startSunrise);
-    int end = convertToMinutes(startNightTime);
-
-
-    int mainLed = map(current, start, end, 0 , pixels.numPixels());
-    Serial.print(mainLed);*/
-}
-
-
-void print2digits(int number) {
-  if (number < 10) {
-    Serial.print("0");
-  }
-  Serial.print(number);
-}
-
-// receives time in a "HH:MM"" format
-void convertToMinutes(char time[]) {
-
-}
-
-void printTime()
-{
-  Serial.println("TIME:");
-  Serial.println("GMT:" + GMT);
-
-  Serial.println();
-
-  print2digits(rtc.getHours());
-  Serial.print(":");
-  print2digits(rtc.getMinutes());
-  Serial.print(":");
-  print2digits(rtc.getSeconds());
-
-  Serial.println(" ");
-
-}
-
-void printDate()
-{
-  Serial.println("DATE:");
-  Serial.println();
-
-  Serial.print(rtc.getDay());
-  Serial.print("/");
-  Serial.print(rtc.getMonth());
-  Serial.print("/");
-  Serial.print(rtc.getYear());
-
-  Serial.println(" ");
 }
