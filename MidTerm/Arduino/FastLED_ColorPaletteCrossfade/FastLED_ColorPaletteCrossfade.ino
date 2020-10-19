@@ -80,10 +80,6 @@ unsigned long startLEDMillis;
 unsigned long currentMillis;
 const unsigned long period = 1000;
 
-
-int color1 = 180;
-int color2 = 0;
-
 bool paletteMsg_1 = true;
 bool paletteMsg_2 = true;
 bool paletteMsg_3 = true;
@@ -563,9 +559,9 @@ void ChangePalettePeriodically_bottom(unsigned long startMillis,
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
-                                    CHSV(64, 255, 255),
+                                    CHSV(64, 0, 255),
                                     /**/
-                                    CHSV(64, 255, 255),
+                                    CHSV(64, 0, 255),
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
