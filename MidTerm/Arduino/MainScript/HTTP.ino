@@ -1,4 +1,4 @@
-JSONVar apiHttpRequest(JSONVar myDataObject) {
+JSONVar apiSunTimesRequest(JSONVar myDataObject) {
   // assemble the path for the GET message:
   String path = "/sun";
 
@@ -11,13 +11,13 @@ JSONVar apiHttpRequest(JSONVar myDataObject) {
   String response = httpclient.responseBody();
   Serial.print("Status code: ");
   Serial.println(statusCode);
-  Serial.print("Response: ");
+  Serial.print("/sun Response: ");
   Serial.println(response);
 
   //Write the Data to the SD Card
   //writeToSD(response);
-  
-  
+
+
   // parse the string into a JSONVar object:
   myDataObject = JSON.parse(response);
   // myDataObject.keys() can be used to get an array
@@ -41,7 +41,7 @@ JSONVar apiHttpRequest(JSONVar myDataObject) {
   sunsetMillis = myDataObject["sunset"]["time"]["ms"];
   duskMillis = myDataObject["dusk"]["time"]["ms"];
   nightMillis = myDataObject["night"]["time"]["ms"];
-  
+
 
   // Set the color for each event
   dawnR = myDataObject["dawn"]["color1"]["r"];
@@ -94,10 +94,30 @@ JSONVar apiHttpRequest(JSONVar myDataObject) {
     // and what's the value of the key:
     Serial.print(value);
     // and what's the type of the value:
-    Serial.print("\ttype: ");
+    Serial.print("\type: ");
     Serial.println(JSON.typeof(value));
 
     //setTimeData(myDataObject);
     return  myDataObject;
   }
+}
+
+JSONVar apiCurrentTimeRequest() {
+  // assemble the path for the GET message:
+  String path = "/now";
+
+  // send the GET request
+  Serial.println("making GET request");
+  httpclient.get(path);
+
+  // read the status code and body of the response
+  int statusCode = httpclient.responseStatusCode();
+  String response = httpclient.responseBody();
+  Serial.print("Status code: ");
+  Serial.println(statusCode);
+  Serial.print("/now Response: ");
+  Serial.println(response);
+  currentTimeOfDay = response.toInt();
+
+
 }

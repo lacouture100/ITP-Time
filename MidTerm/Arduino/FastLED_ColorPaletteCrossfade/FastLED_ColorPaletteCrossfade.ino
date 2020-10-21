@@ -108,11 +108,14 @@ void loop()
     Serial.println(timeCounter);
     timeCounter += 1;
   }
+ 
 
 
   // Here we set currentMillis to the now() time.
-  ChangePalettePeriodically_bottom(startLEDMillis, currentMillis,  30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000  );
-  ChangePalettePeriodically_top(startLEDMillis, currentMillis, 30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000  );
+  ChangePalettePeriodically_bottom(startLEDMillis, currentMillis, 50000, 75000, 100000, 135000, 350000, 600000, 650000, 675000, 725000  );
+    ChangePalettePeriodically_top(startLEDMillis, currentMillis,  50000, 75000, 100000, 135000, 350000, 600000, 650000, 675000, 725000 );
+
+  //ChangePalettePeriodically_top(startLEDMillis, currentMillis, 50000, 75000, 100000, 135000, 350000, 600000, 650000, 675000, 725000 );
 
 
 
@@ -124,8 +127,8 @@ void loop()
   //   - the default of 24 is a good balance
   //   - meaningful values are 1-48.  1=veeeeeeeery slow, 48=quickest
   //   - "0" means do not change the currentPalette at all; freeze
-  //if (currentMillis % 4 == 0) {
-  uint8_t maxChanges = 10;
+  //(currentMillis % 4 == 0) {
+  uint8_t maxChanges = 4;
   nblendPaletteTowardPalette( currentPalette, targetPalette, maxChanges);
   nblendPaletteTowardPalette( currentPalette2, targetPalette2, maxChanges);
   // }
@@ -166,20 +169,21 @@ void FillLEDsFromPaletteColors2( uint8_t colorIndex)
 
 
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ChangePalettePeriodically_top(unsigned long startMillis,
-                                      unsigned long currentMillis,
-                                      long interval1,
-                                      long interval2,
-                                      long interval3,
-                                      long interval4,
-                                      long interval5,
-                                      long interval6,
-                                      long interval7,
-                                      long interval8,
-                                      long interval9
-                                     ) {
+                                   unsigned long currentMillis,
+                                   long interval1,
+                                   long interval2,
+                                   long interval3,
+                                   long interval4,
+                                   long interval5,
+                                   long interval6,
+                                   long interval7,
+                                   long interval8,
+                                   long interval9
+                                  ) {
 
 
 
@@ -252,10 +256,10 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
                                      CHSV(160, 255, 255),
                                      CHSV(160, 255, 255),
                                      CHSV(64, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    /**/
-                                    CHSV(64, 255, 255),
-                                    CHSV(64, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     /**/
+                                     CHSV(64, 255, 255),
+                                     CHSV(64, 255, 255),
                                      CHSV(160, 255, 255),
                                      CHSV(160, 255, 255),
                                      /**/
@@ -270,24 +274,24 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
       paletteMsg_4 = false;
     }
     targetPalette2 = CRGBPalette16( CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   /**/
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   /**/
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   /**/
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255),
-                                   CHSV(160, 255, 255));
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    /**/
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    /**/
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    /**/
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255),
+                                    CHSV(160, 255, 255));
   }
   if ( currentMillis - startMillis > interval4 && currentMillis - startMillis <= interval5)  {
     if (paletteMsg_5 && (currentMillis - startMillis <  interval4 + 1000)) {
@@ -296,24 +300,24 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
     }
 
     targetPalette2 =  CRGBPalette16( CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    /**/
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    /**/
-                                    CHSV(64, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    /**/
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255));
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     /**/
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     /**/
+                                     CHSV(64, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     /**/
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255));
   }
   if ( currentMillis - startMillis > interval5 && currentMillis - startMillis <= interval6)  {
     if (paletteMsg_6 && (currentMillis - startMillis <  interval5 + 1000)) {
@@ -322,24 +326,24 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
     }
 
     targetPalette2 =  CRGBPalette16( CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    /**/
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    /**/
-                                    CHSV(64, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    /**/
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255));
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     /**/
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     /**/
+                                     CHSV(64, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     /**/
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255));
   }
   if ( currentMillis - startMillis > interval6 && currentMillis - startMillis <= interval7)  {
     if (paletteMsg_7 && (currentMillis - startMillis <  interval6 + 1000)) {
@@ -348,24 +352,24 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
     }
 
     targetPalette2 =  CRGBPalette16( CHSV(180, 255, 255),
-                                    CHSV(180, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    /**/
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    /**/
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    /**/
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(180, 255, 255),
-                                    CHSV(180, 255, 255));
+                                     CHSV(180, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     /**/
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     /**/
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     /**/
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(180, 255, 255),
+                                     CHSV(180, 255, 255));
   }
   if ( currentMillis - startMillis > interval7 && currentMillis - startMillis <= interval8)  {
     if (paletteMsg_8 && (currentMillis - startMillis <  interval7 + 1000)) {
@@ -374,24 +378,24 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
     }
 
     targetPalette2 =  CRGBPalette16( CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    /**/
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    /**/
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    /**/
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255));
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     /**/
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     /**/
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     /**/
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255));
   }
   if ( currentMillis - startMillis > interval8 && currentMillis - startMillis <= interval8)  {
     if (paletteMsg_9 && (currentMillis - startMillis <  interval8 + 1000)) {
@@ -400,24 +404,24 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
     }
 
     targetPalette2 =  CRGBPalette16( CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    /**/
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    /**/
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    /**/
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255),
-                                    CHSV(180, 200, 255));
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     /**/
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     /**/
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     /**/
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255),
+                                     CHSV(180, 200, 255));
     currentMillis = millis();
   }
 }
@@ -425,17 +429,17 @@ void ChangePalettePeriodically_top(unsigned long startMillis,
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ChangePalettePeriodically_bottom(unsigned long startMillis,
-                                   unsigned long currentMillis,
-                                   long interval1,
-                                   long interval2,
-                                   long interval3,
-                                   long interval4,
-                                   long interval5,
-                                   long interval6,
-                                   long interval7,
-                                   long interval8,
-                                   long interval9
-                                  ) {
+                                      unsigned long currentMillis,
+                                      long interval1,
+                                      long interval2,
+                                      long interval3,
+                                      long interval4,
+                                      long interval5,
+                                      long interval6,
+                                      long interval7,
+                                      long interval8,
+                                      long interval9
+                                     ) {
 
 
 
@@ -526,24 +530,24 @@ void ChangePalettePeriodically_bottom(unsigned long startMillis,
       paletteMsg_4 = false;
     }
     targetPalette = CRGBPalette16( CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    /**/
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    /**/
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    /**/
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255),
-                                    CHSV(0, 0, 255));
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   /**/
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   /**/
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   /**/
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255),
+                                   CHSV(0, 0, 255));
   }
   if ( currentMillis - startMillis > interval4 && currentMillis - startMillis <= interval5)  {
     if (paletteMsg_5 && (currentMillis - startMillis <  interval4 + 1000)) {
@@ -559,9 +563,9 @@ void ChangePalettePeriodically_bottom(unsigned long startMillis,
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
-                                    CHSV(64, 0, 255),
+                                    CHSV(64, 255, 255),
                                     /**/
-                                    CHSV(64, 0, 255),
+                                    CHSV(64, 255, 255),
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
                                     CHSV(32, 255, 255),
@@ -604,24 +608,24 @@ void ChangePalettePeriodically_bottom(unsigned long startMillis,
     }
 
     targetPalette =   CRGBPalette16( CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    /**/
-                                    CHSV(0, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(64, 255, 255),
-                                    /**/
-                                    CHSV(64, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(32, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    /**/
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255),
-                                    CHSV(0, 255, 255));
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     /**/
+                                     CHSV(0, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(64, 255, 255),
+                                     /**/
+                                     CHSV(64, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(32, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     /**/
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255),
+                                     CHSV(0, 255, 255));
   }
   if ( currentMillis - startMillis > interval7 && currentMillis - startMillis <= interval8)  {
     if (paletteMsg_8 && (currentMillis - startMillis <  interval7 + 1000)) {
@@ -654,26 +658,28 @@ void ChangePalettePeriodically_bottom(unsigned long startMillis,
       Serial.println("Ninth Palette activated - NIGHT");
       paletteMsg_9 = false;
     }
-
-    targetPalette =  CRGBPalette16( CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    /**/
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    /**/
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    /**/
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100),
-                                    CHSV(180, 100, 100));
-    currentMillis = millis();
+    targetPalette =  CRGBPalette16();
+  
+    targetPalette =  CRGBPalette16( CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    //
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    //
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    //
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20),
+                                    CHSV(180, 100, 20));
+        
+    
   }
 }

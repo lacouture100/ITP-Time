@@ -24,17 +24,17 @@ void startAPserver(WiFiServer server) {
   Serial.print("Access Point Started! Hoorray!");
   // you're connected now, so print out the status
   printWiFiStatus();
-  isAPActive = true;
+
 }
 
 void LoadAPClientPage(WiFiClient APclient) {
-  Serial.println("new client");           // print a message out the serial port
+  //Serial.println("new client");           // print a message out the serial port
   String currentLine = ""; // make a String to hold incoming data from the client
   while (APclient.connected()) {            // loop while the client's connected
     if (APclient.available()) {             // if there's bytes to read from the client,
       char c = APclient.read();
 
-      Serial.write(c);                    // print it out the serial monitor
+      //Serial.write(c);                    // print it out the serial monitor
       if (c == '\n') {                    // if the byte is a newline character
 
         // if the current line is blank, you got two newline characters in a row.
@@ -79,10 +79,6 @@ void LoadAPClientPage(WiFiClient APclient) {
           APclient.println("<div class=\"submitButton\"><input type=\"submit\" value=\"submit\"><form></div>");
 
 
-
-
-
-
           //Render the time on screen
           APclient.println("<script>function currentGMTTimeInMillis(){const utcDate = new Date(Date.now()); const utcDateInMillis = Date.now();const timezoneOffset = utcDate.getTimezoneOffset();const GMTchangeInMillis = (timezoneOffset * -1) * 60 * 1000;const currentTimeInMillis = utcDateInMillis + GMTchangeInMillis;return currentTimeInMillis;}const myDate = new Date(currentGMTTimeInMillis()).toGMTString();console.log(currentGMTTimeInMillis()); console.log(myDate);</script>");
           APclient.println("<script>document.getElementById('data').innerHTML = `Time is :${myDate}`</script>");
@@ -112,12 +108,12 @@ void LoadAPClientPage(WiFiClient APclient) {
   }
   // close the connection:
 
-  Serial.println("currentLine: ");
-  Serial.println(APdataString);
+  //Serial.println("currentLine: ");
+  //Serial.println(APdataString);
 
 
   APclient.stop();
-  Serial.println("client disconnected");
+  //Serial.println("client disconnected");
 }
 
 void processDataRequest(String readString) {
@@ -136,7 +132,7 @@ void processDataRequest(String readString) {
   int  ind4_end = readString.indexOf('&', ind3_end + 1);
 
   int ind5_start = readString.indexOf('=', ind4_start + 1);
-   int ind5_end_1 = readString.indexOf('\n'); 
+  int ind5_end_1 = readString.indexOf((" "));
   int ind5_end = readString.indexOf('\n', ind5_end_1 + 1);
 
   //capture the values in the response string
@@ -152,19 +148,4 @@ void processDataRequest(String readString) {
   Serial.println(GMTString);
 
 
-}
-
-void printWiFiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print where to go in a browser:
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
 }

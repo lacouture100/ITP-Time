@@ -1,2 +1,2 @@
-#define SECRET_SSID "Oracle"
-#define SECRET_PASS "3081R8183G"
+#define SECRET_SSID ""
+#define SECRET_PASS ""

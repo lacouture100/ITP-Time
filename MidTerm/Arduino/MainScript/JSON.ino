@@ -1,5 +1,0 @@
-/*void setTimeData(JSONVar data){
-  
-  }
-}
-*/
